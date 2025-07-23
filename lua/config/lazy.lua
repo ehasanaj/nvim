@@ -55,3 +55,5 @@ require("lazy").setup({
     },
   },
 })
+
+require("catppuccin").load("frappe")
