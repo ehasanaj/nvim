@@ -56,4 +56,5 @@ require("lazy").setup({
   },
 })
 
-require("catppuccin").load("frappe")
+--require("catppuccin").load("frappe")
+require("tokyonight").load({ style = "night" })
