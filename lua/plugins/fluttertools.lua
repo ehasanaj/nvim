@@ -6,4 +6,7 @@ return {
     "stevearc/dressing.nvim", -- optional for vim.ui.select
   },
   config = true,
+  debugger = {
+    enabled = false,
+  },
 }
