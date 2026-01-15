@@ -5,12 +5,16 @@ return {
   --{ "arcticicestudio/nord-vim", name = "nord" },
   -- add alternarive nord.nvim theme
   { "shaunsingh/nord.nvim", name = "nord" },
+  -- add onedark theme
+  { "navarasu/onedark.nvim", name = "onedark" },
+  -- add catppuccin theme
+  { "catppuccin/nvim", name = "catppuccin" },
 
-  -- Configure LazyVim to load gruvbox
+  -- Configure LazyVim to load the colorscheme
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "nord",
+      colorscheme = "onedark",
     },
   },
 }
