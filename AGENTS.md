@@ -1,0 +1,149 @@
+# AGENTS.md (Neovim / LazyVim config)
+
+This repository is a Neovim configuration based on LazyVim + lazy.nvim.
+Most code is Lua (under `lua/`) plus a few JSON lock/config files.
+
+## Repo layout (where to change things)
+
+- `init.lua` – entrypoint; bootstraps lazy.nvim via `require("config.lazy")`.
+- `lua/config/lazy.lua` – lazy.nvim bootstrap + `require("lazy").setup({ ... })`.
+- `lua/config/options.lua` – custom `vim.opt.*` settings.
+- `lua/config/keymaps.lua` – keymaps and filetype-specific mappings.
+- `lua/config/autocmds.lua` – autocmds (defaults are in LazyVim).
+- `lua/plugins/*.lua` – plugin specs (each file is loaded by lazy.nvim).
+- `stylua.toml` – formatting rules (2 spaces, 120 columns).
+- `lazy-lock.json` – generated lockfile; do not hand-edit.
+
+## Commands (format / lint / test)
+
+This is a config repo, so there is no “build” step.
+Validation is mostly formatting checks + headless Neovim smoke runs.
+
+### Format (Lua)
+
+- Format everything:
+  - `stylua .`
+- Check formatting (CI-style):
+  - `stylua --check .`
+- Format/check a single file:
+  - `stylua lua/plugins/opencode.lua`
+  - `stylua --check lua/config/keymaps.lua`
+
+Notes:
+- Formatting is governed by `stylua.toml`.
+- `stylua: ignore` comments are used in a few places for compact tables.
+
+### Lint / static checks
+
+- No dedicated linter (e.g. selene/luacheck) is configured in this repo.
+- Prefer relying on `lua_ls` diagnostics inside Neovim (LazyVim + neodev/neoconf).
+
+If you introduce a linter, document it here and add its config to the repo.
+
+### Smoke tests (headless Neovim)
+
+These are the closest equivalent to “tests” for a Neovim config.
+
+- Basic startup + quit:
+  - `nvim --headless "+qa"`
+
+- Fail the process if config errors (useful in CI):
+  - `nvim --headless "+lua local ok, err = pcall(require, 'config.lazy'); if not ok then vim.api.nvim_err_writeln(err); vim.cmd('cq') end" +qa`
+
+- Run Neovim health checks (slower, but catches missing deps):
+  - `nvim --headless "+checkhealth" +qa`
+
+### Plugin bootstrap / sync (writes to disk; may require network)
+
+These commands modify your local Neovim data directory (and may download).
+Only run them when you intend to update the local environment.
+
+- Install/update plugins:
+  - `nvim --headless "+Lazy! sync" +qa`
+- Clean unused plugins:
+  - `nvim --headless "+Lazy! clean" +qa`
+
+Tip: plugin state typically lives under `$XDG_DATA_HOME/nvim/`.
+
+## Code style guidelines
+
+Follow existing patterns in this repo and keep changes minimal.
+
+### Formatting
+
+- Use `stylua` for all Lua changes.
+- Indentation: 2 spaces.
+- Preferred max width: 120 columns.
+
+### Imports / `require()` patterns
+
+- Prefer `local foo = require("foo")` at the top when the module is always present.
+- Prefer `require("foo")` inside callbacks (`config = function() ... end`, keymap callbacks)
+  when the module should only load on demand.
+- Avoid requiring plugin modules at top-level unless they are declared as dependencies
+  and guaranteed to be installed/loaded.
+
+### lazy.nvim plugin specs (`lua/plugins/*.lua`)
+
+- Each file should `return { ... }`.
+- A spec can be:
+  - a plugin string with fields (`"folke/flash.nvim"`, `event`, `keys`, ...), or
+  - a list of plugin spec tables.
+- Prefer configuring plugins with `opts = { ... }` when supported.
+- When modifying defaults, prefer merging:
+  - `opts = function(_, opts) ... return opts end`
+- Use `dependencies = { ... }` for required plugins.
+- Use `enabled = false` to disable a plugin.
+
+### Keymaps
+
+- Prefer `vim.keymap.set()` over `vim.api.nvim_set_keymap()` for new mappings.
+- Always include a `desc` for user-facing mappings.
+- For filetype-specific mappings, use `vim.api.nvim_create_autocmd("FileType", ...)`.
+
+### Autocmds
+
+- Prefer `vim.api.nvim_create_autocmd()`.
+- Use clear `pattern` and a small `callback`.
+- Avoid expensive work in autocmd callbacks.
+
+### Types / annotations
+
+- This repo uses EmmyLua annotations in places (e.g. `---@type ...`, `---@param ...`).
+- Add annotations when they improve editor diagnostics or clarify plugin option shapes.
+- Keep annotations close to the value/function they describe.
+
+### Naming
+
+- Use descriptive names (avoid one-letter locals except tiny loops).
+- Prefer `snake_case` for locals and helper functions.
+- Keep filenames lowercase (match existing `lua/plugins/*.lua` naming).
+
+### Error handling
+
+- Prefer failing fast for required modules (a missing dependency should be obvious).
+- Use `pcall(require, ...)` only for truly optional integrations.
+- For user-visible errors/warnings:
+  - Prefer `vim.notify(msg, vim.log.levels.ERROR/WARN)`.
+  - Bootstrap code may use `vim.api.nvim_echo()` (see `lua/config/lazy.lua`).
+
+### Performance / side effects
+
+- Avoid side effects at module top-level unless necessary.
+- Keep startup fast:
+  - lazy-load plugins via `event`, `cmd`, `ft`, or `keys` where appropriate.
+  - put heavyweight setup in `config` callbacks.
+
+## Generated / managed files
+
+- `lazy-lock.json` is generated by lazy.nvim.
+  - Do not hand-edit; update via `:Lazy update` / `:Lazy sync`.
+- `lazyvim.json` and `.neoconf.json` are JSON config files.
+  - Keep valid JSON, 2-space indentation.
+
+## Cursor / Copilot rules
+
+- No Cursor rules found (`.cursor/rules/` or `.cursorrules`).
+- No Copilot instructions found (`.github/copilot-instructions.md`).
+
+If these appear in the future, follow them and keep this file in sync.
