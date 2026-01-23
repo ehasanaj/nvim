@@ -1,6 +1,6 @@
 return {
   -- add gruvbox
-  { "ellisonleao/gruvbox.nvim" },
+  { "ellisonleao/gruvbox.nvim", name = "gruvbox" },
   -- add nord theme
   --{ "arcticicestudio/nord-vim", name = "nord" },
   -- add alternarive nord.nvim theme
@@ -14,7 +14,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "onedark",
+      colorscheme = "gruvbox",
     },
   },
 }
