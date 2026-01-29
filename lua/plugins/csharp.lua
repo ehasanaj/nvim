@@ -1,8 +1,8 @@
 return {
-  "neovim/nvim-lspconfig",
-  opts = {
-    servers = {
-      csharp_ls = {},
-    },
-  },
+  --   "neovim/nvim-lspconfig",
+  --   opts = {
+  --     servers = {
+  --       csharp_ls = {},
+  --     },
+  --   },
 }
