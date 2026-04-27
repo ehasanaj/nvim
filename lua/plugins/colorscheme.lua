@@ -9,6 +9,8 @@ return {
   { "navarasu/onedark.nvim", name = "onedark" },
   -- add catppuccin theme
   { "catppuccin/nvim", name = "catppuccin" },
+  -- add flexoki theme
+  { "kepano/flexoki-neovim", name = "flexoki" },
   -- add everforest theme
   {
     "neanias/everforest-nvim",
